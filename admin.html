@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>لوحة Triabo - Admin</title>
+<style>body{font-family:Arial, sans-serif;direction:rtl;padding:12px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:6px;text-align:right}th{background:#f4f4f4}</style>
+</head><body>
+<h2>لوحة إدارة Triabo</h2>
+<p>ادخل الـADMIN_TOKEN في الهيدر (x-admin-token) كـباراميتر ?admin_token=TOKEN للوصول.</p>
+<button id="load">تحميل البيانات</button>
+<h3>التراخيص</h3>
+<div id="licenses"></div>
+<h3>التفعيلات الأخيرة</h3>
+<div id="activations"></div>
+<script>
+async function loadData(){
+  const token = new URLSearchParams(location.search).get('admin_token') || prompt('ادخل admin token:');
+  if(!token) return alert('مطلوب admin token');
+  const resp = await fetch('/api/admin/overview?admin_token='+encodeURIComponent(token));
+  const j = await resp.json();
+  if(!j.ok) return alert('خطأ: '+(j.error||'failed'));
+  const lic = j.licenses.map(x=>`<tr><td>${x.license_key}</td><td>${x.type}</td><td>${x.owner_email||''}</td><td>${new Date(x.created_at).toLocaleString()}</td><td>${x.expires_at?new Date(x.expires_at).toLocaleString():''}</td><td>${x.revoked}</td></tr>`).join('');
+  document.getElementById('licenses').innerHTML = `<table><tr><th>كود</th><th>النوع</th><th>مالك</th><th>انشأ</th><th>ينتهي</th><th>موقف</th></tr>${lic}</table>`;
+  const act = j.activations.map(a=>`<tr><td>${a.license_key}</td><td>${a.ip}</td><td>${a.country||''}</td><td>${a.asn||''}</td><td>${new Date(a.created_at).toLocaleString()}</td></tr>`).join('');
+  document.getElementById('activations').innerHTML = `<table><tr><th>كود</th><th>IP</th><th>بلد</th><th>ASN</th><th>تاريخ</th></tr>${act}</table>`;
+}
+document.getElementById('load').addEventListener('click', loadData);
+</script>
+</body></html>

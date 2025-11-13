@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  triabo-license:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./private.pem:/usr/src/app/private.pem:ro
+      - ./public.pem:/usr/src/app/public.pem:ro
+      - ./licenses.db:/usr/src/app/licenses.db
+    environment:
+      - ADMIN_TOKEN=${ADMIN_TOKEN}
+      - HWID_SALT=${HWID_SALT}
+      - IPINFO_TOKEN=${IPINFO_TOKEN}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - RP_NAME=${RP_NAME}
+      - RP_ID=${RP_ID}
+      - ORIGIN=${ORIGIN}
